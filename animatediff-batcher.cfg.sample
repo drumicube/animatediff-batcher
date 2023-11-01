@@ -1,0 +1,25 @@
+# Path to your automatic1111 local install
+auto1111_folder="/myfolder/stable-diffusion-webui"
+
+# Path to animatediff movies to be processed (should contains .txt and .gif animations)
+animatediff_input_folder="/myfolder/Videos/AnimateDiff_Projects"
+
+# Upscale x4 using Real-ESRGAN
+real_esrgan_command="/myfolder/realesrgan-ncnn-vulkan-v0.2.0-ubuntu/realesrgan-ncnn-vulkan"
+real_esrgan_model=4x-UltraSharp-opt-fp16
+
+# Frame Interpolation using IFRNet
+#interpol_command="/myfolder/ifrnet-ncnn-vulkan-20220720-ubuntu/ifrnet-ncnn-vulkan"
+#interpol_model="IFRNet_Vimeo90K"
+#interpol_folder="ifrnet"
+
+# Frame Interpolation using Rife
+interpol_command="/myfolder/rife-ncnn-vulkan-20221029-ubuntu/rife-ncnn-vulkan"
+interpol_model="rife-v4"
+interpol_folder="rife"
+
+# ffmpeg final clip settings
+width=1024
+height=1536
+quality=19  # 0–51 (23 is the default,  17 or 18 to be visually lossless , and 51 is worst quality possible.)
+fps=60

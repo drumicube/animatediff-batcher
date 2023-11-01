@@ -1,11 +1,12 @@
 #!/bin/bash
 
+script_dir="$(dirname "$(readlink -f "$0")")"
+source $script_dir/animatediff-batcher.cfg
+
 clipfolder=$1
 [ $# -eq 0 ] && { echo "No clip folder provided."; exit 1; }
 
-animatediffprojectfolder="/home/yoyo2k1/Videos/AnimateDiff_Projects"
-
-outputfolder=$animatediffprojectfolder/$clipfolder"/output/*/"
+outputfolder=$animatediff_input_folder/$clipfolder"/output/*/"
 
 for subclipdir in $outputfolder
 do

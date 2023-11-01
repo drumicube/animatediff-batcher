@@ -132,7 +132,7 @@ if not os.path.isdir(animatediff_path):
     print("Aborting animatediff_path: " + animatediff_path + " does not exist.")
     exit(1)
 
-inputFolder = clipFolder + "/input_auto1111"
+inputFolder = clipFolder
 processedFolder = inputFolder + "/processed"
 interpFolder = processedFolder + "/interp"
 archivedFolder = inputFolder + "/archived"
