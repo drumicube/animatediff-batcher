@@ -118,35 +118,29 @@ Steps: 20, Sampler: Euler a, CFG scale: 7, Seed: 965400086, Size: 512x512, Model
 
 # ########################### script starts here ###############################
 
-if len(sys.argv) != 3:
+if len(sys.argv) != 4:
     print("Aborting: invalid number or input arguments for " + sys.argv[0] + " script.")
     exit(1)
-
 clipFolder = sys.argv[1]
 auto1111Folder = sys.argv[2]
-animatediff_path = auto1111Folder + "/outputs/txt2img-images/AnimateDiff"
+clipName = sys.argv[3]
+
 if not os.path.isdir(clipFolder):
     print("Aborting clipFolder: " + clipFolder + " does not exist.")
     exit(1)
+animatediff_path = auto1111Folder + "/outputs/txt2img-images/AnimateDiff"
 if not os.path.isdir(animatediff_path):
     print("Aborting animatediff_path: " + animatediff_path + " does not exist.")
     exit(1)
 
-inputFolder = clipFolder
-processedFolder = inputFolder + "/processed"
-interpFolder = processedFolder + "/interp"
-archivedFolder = inputFolder + "/archived"
-
-if not os.path.isdir(inputFolder):
-    print("Aborting: " + inputFolder + " does not exist. ")
-    exit(1)
+processedFolder = clipFolder + "/processed"
+framesFolder = processedFolder + "/frames"
 if not os.path.exists(processedFolder):
     os.makedirs(processedFolder)
-if not os.path.exists(interpFolder):
-    os.makedirs(interpFolder)
-if not os.path.exists(archivedFolder):
-    os.makedirs(archivedFolder)
+if not os.path.exists(framesFolder):
+    os.makedirs(framesFolder)
 
+# Rebulding the clip with Adetailer on and frame interpolation Off
 
 alwayson_scripts = {
     "ADetailer": {
@@ -169,8 +163,8 @@ alwayson_scripts = {
             'batch_size': 16,  # Context batch size
             'stride': 1,  # Stride
             'overlap': -1,  # Overlap
-            'interp': 'FILM',  # Frame interpolation, 'Off' | 'FILM'
-            'interp_x': 4,  # Interp X
+            'interp': 'Off',  # Frame interpolation, 'Off' | 'FILM'
+            'interp_x': 10,  # Interp X
             'video_source': '',  # Video source
             'video_path': '',  # Video path
             'latent_power': 1,  # Latent power
@@ -183,44 +177,54 @@ alwayson_scripts = {
     }
 }
 
-# scan of txt files in input folder
-for file in os.listdir(inputFolder):
-    if file.endswith(".txt"):
-        metadata_file = open(os.path.join(inputFolder, file), "r")
-        metadata_txt = metadata_file.read()
-        print(metadata_txt)
-        metadata_file.close()
-        metadata = parse_generation_parameters(metadata_txt)
+# Check original files
+originalMetadataFileName = clipFolder + "/" + clipName + ".txt"
+if not os.path.isfile(originalMetadataFileName):
+    print("Metadata file " + originalMetadataFileName + " not found.")
+    exit(1)
+originalGifFileName = clipFolder + "/" + clipName + ".gif"
+if not os.path.isfile(originalGifFileName):
+    print("Gif file " + originalGifFileName + " not found.")
+    exit(1)
 
-        metadata["width"] = metadata["Size-1"]
-        metadata["height"] = metadata["Size-2"]
-        metadata["cfg_scale"] = metadata["CFG scale"]
-        metadata["denoising_strength"] = 0
-        metadata["seed"] = metadata["Seed"]
-        metadata["steps"] = metadata["Steps"]
-        metadata["prompt"] = metadata["Prompt"]
-        metadata["negative_prompt"] = metadata["Negative prompt"]
-        metadata["sampler_index"] = metadata["Sampler"]
-        metadata["alwayson_scripts"] = alwayson_scripts
+# Read metadata file
+metadata_file = open(os.path.join(originalMetadataFileName), "r")
+metadata_txt = metadata_file.read()
+metadata_file.close()
 
-        response = requests.post(url=f'{url}/sdapi/v1/txt2img', json=metadata)
-        if response.status_code == 200:
-            list_of_txt_files = glob.glob(animatediff_path + '/*.txt')
-            latest_txt_file = max(list_of_txt_files, key=os.path.getctime)
-            generated_filename = os.path.basename(os.path.splitext(latest_txt_file)[0])
+# Rebuild metadata for Auto1111 API
+metadata = parse_generation_parameters(metadata_txt)
+metadata["width"] = metadata["Size-1"]
+metadata["height"] = metadata["Size-2"]
+metadata["cfg_scale"] = metadata["CFG scale"]
 
-            # copy generated files
-            shutil.copyfile(animatediff_path + "/" + generated_filename + ".txt",
-                            processedFolder + "/" + generated_filename + ".txt")
-            shutil.copyfile(animatediff_path + "/" + generated_filename + ".gif",
-                            processedFolder + "/" + generated_filename + ".gif")
-            shutil.copytree(animatediff_path + "/interp/" + generated_filename, interpFolder + "/" + generated_filename)
-            # backup original files
-            fileNoExtension = os.path.splitext(file)[0]
-            shutil.move(inputFolder + "/" + fileNoExtension + ".txt", archivedFolder + "/" + fileNoExtension + ".txt")
-            shutil.move(inputFolder + "/" + fileNoExtension + ".gif", archivedFolder + "/" + fileNoExtension + ".gif")
-            # first clip processed, we exit as Adetailer will fail on the next clip iteration
-            exit(0)
+metadata["denoising_strength"] = 0
 
-print("Aborting: No clip was found in " + inputFolder)
+metadata["seed"] = metadata["Seed"]
+metadata["steps"] = metadata["Steps"]
+metadata["prompt"] = metadata["Prompt"]
+metadata["negative_prompt"] = metadata["Negative prompt"]
+metadata["sampler_index"] = metadata["Sampler"]
+metadata["alwayson_scripts"] = alwayson_scripts
+
+# Call Auto1111 API
+response = requests.post(url=f'{url}/sdapi/v1/txt2img', json=metadata)
+if response.status_code == 200:
+    list_of_txt_files = glob.glob(animatediff_path + '/*.txt')
+    latest_txt_file = max(list_of_txt_files, key=os.path.getctime)
+    generatedClipName = os.path.basename(os.path.splitext(latest_txt_file)[0])
+
+    # copy the new generated clip in the processed folder
+    shutil.copyfile(animatediff_path + "/" + generatedClipName + ".txt",
+                    processedFolder + "/" + clipName + ".txt")
+    shutil.copyfile(animatediff_path + "/" + generatedClipName + ".gif",
+                    processedFolder + "/" + clipName + ".gif")
+    # Copy frames
+    shutil.copytree(animatediff_path + "/" + generatedClipName, framesFolder + "/" + clipName, dirs_exist_ok=True)
+    exit(0)
+
 exit(1)
+
+
+
+

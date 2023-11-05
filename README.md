@@ -10,15 +10,19 @@ It kills and reload Auto1111 on each animation, preventing ADetailer to crash af
 
 ## Requirements
 
+* ffmpeg
+* python3.10
 * [RIFE ncnn Vulkan](https://github.com/nihui/rife-ncnn-vulkan) or [IFRNet ncnn Vulkan](https://github.com/nihui/ifrnet-ncnn-vulkan)
 * [Real-ESRGAN ncnn Vulkan](https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan)
 * Auto1111 configured to autostart with api support (--api)
-* ffmpeg
-* python3.10
+* Auto1111 configured with 'Pad prompt/negative prompt to be same length'
+* AnimateDiff extension configured with 'Save frames to stable-diffusion-webui/outputs/{ txt|img }2img-images/AnimateDiff/{gif filename}/'
+
 
 ## Limitations
 
-* Swapping checkpoints is not supported, this script will use the last loaded checkpoint from your Auto1111 settings.
+* Swapping checkpoints is not supported, the last loaded checkpoint from Auto1111 will be used.
+* Prompt travel is not supported.
 
 
 ## Configuration

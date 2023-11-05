@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# test rife not upscaled from auto1111
+# /home/yoyo2k1/projects/rife-ncnn-vulkan-20221029-ubuntu/rife-ncnn-vulkan -m rife-v4.6 -x -n 128 -i /home/yoyo2k1/Videos/test/input/ -o /home/yoyo2k1/Videos/test/output/
+# test IFRNet not upscaled from auto1111
+# /home/yoyo2k1/projects/ifrnet-ncnn-vulkan-20220720-ubuntu/ifrnet-ncnn-vulkan -m IFRNet_GoPro -x -n 128 -i /home/yoyo2k1/Videos/test/input/ -o /home/yoyo2k1/Videos/test/output2/
+# rebuild movie
+# ffmpeg -y -framerate 60 -i /home/yoyo2k1/Videos/test/output/%08d.png -crf 19 -c:v libvpx-vp9 -vf scale="1024:1536" -pix_fmt yuv420p /home/yoyo2k1/Videos/test/output/movie.webm
+
+
 script_dir="$(dirname "$(readlink -f "$0")")"
 source $script_dir/animatediff-batcher.cfg
 
