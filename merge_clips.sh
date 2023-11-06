@@ -10,21 +10,25 @@ outputfolder=$animatediff_input_folder/$clipfolder"/output/*/"
 
 for subclipdir in $outputfolder
 do
+
+  movie_name=${subclipdir#"$animatediff_input_folder/$clipfolder/output/"}
+  movie_name=${movie_name%"/"}
+
   ### Rebuild cliplist txt file
   echo "#####################################################################"
-  echo Rebuilding sub txt cliplist: $subclipdir"cliplist_webm.txt"
-  rm -f $subclipdir"cliplist_webm.txt"
+  echo Rebuilding sub txt cliplist: $subclipdir"cliplist_$movie_name.txt"
+  rm -f $subclipdir"cliplist_$movie_name.txt"
   for f in $subclipdir*.webm
   do
       if [[ ! $f == *merged* ]]
       then
-          echo "file '$f'" >> $subclipdir"cliplist_webm.txt"
+          echo "file '$f'" >> $subclipdir"cliplist_$movie_name.txt"
       fi
   done
 
   ### Merge all clips together
-  echo Merging all sub clips into $subclipdir"merged.webm"
-  ffmpeg -y -loglevel 0 -safe 0 -f concat -i $subclipdir"cliplist_webm.txt" -c copy $subclipdir"merged.webm"
+  echo Merging all sub clips into $subclipdir"merged_$movie_name.webm"
+  ffmpeg -y -loglevel 0 -safe 0 -f concat -i $subclipdir"cliplist_$movie_name.txt" -c copy $subclipdir"merged_$movie_name.webm"
   echo "#####################################################################"
 
 done

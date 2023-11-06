@@ -63,7 +63,8 @@ for file in "${filesList[@]}"; do
       fi
 
       # Build final clip
-      ffmpeg -y -framerate $fps -i $inputfolder/processed/frames/$movie_name/rife/%08d.png -crf $quality -c:v libvpx-vp9 -vf scale="$width:$height" -pix_fmt yuv420p $inputfolder/$movie_name.webm
+      mkdir -p $inputfolder/output
+      ffmpeg -y -framerate $fps -i $inputfolder/processed/frames/$movie_name/rife/%08d.png -crf $quality -c:v libvpx-vp9 -vf scale="$width:$height" -pix_fmt yuv420p $inputfolder/output/$movie_name.webm
 
       # Archive the original clip
       if [[ ! -d $inputfolder/archived ]]; then
