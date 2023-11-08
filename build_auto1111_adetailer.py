@@ -8,6 +8,8 @@ import shutil
 import base64
 from PIL import Image
 import re
+from datetime import date
+
 
 url = "http://127.0.0.1:7860"
 
@@ -210,6 +212,8 @@ metadata["alwayson_scripts"] = alwayson_scripts
 # Call Auto1111 API
 response = requests.post(url=f'{url}/sdapi/v1/txt2img', json=metadata)
 if response.status_code == 200:
+    today_date = date.today().strftime("%Y-%m-%d")
+    animatediff_path = animatediff_path + "/" + today_date
     list_of_txt_files = glob.glob(animatediff_path + '/*.txt')
     latest_txt_file = max(list_of_txt_files, key=os.path.getctime)
     generatedClipName = os.path.basename(os.path.splitext(latest_txt_file)[0])
