@@ -143,7 +143,7 @@ alwayson_scripts = {
         "args": [
             {
                 "ad_model": "face_yolov8n.pt",
-                "ad_mask_k_largest": 4,
+                "ad_mask_k_largest": 6,
             }
         ]
     }
@@ -177,6 +177,10 @@ metadata["negative_prompt"] = metadata["Negative prompt"]
 metadata["sampler_index"] = metadata["Sampler"]
 metadata["alwayson_scripts"] = alwayson_scripts
 
+OKGREEN = '\033[92m'
+ENDC = '\033[0m'
+current_frame = 0
+
 filelist=os.listdir(esrganFramesFolder)
 for imageName in filelist[:]:
     if not(imageName.endswith(".png")):
@@ -204,6 +208,8 @@ for imageName in filelist[:]:
         }
 
     # Call Auto1111 API
+    print(f"\n{OKGREEN}[HIRESFIX-API-CALL] Building frame number {current_frame} for {clipName}{ENDC}\n")
+    current_frame += 1
     response = requests.post(url=f'{url}/sdapi/v1/img2img', json=img2img_payload)
     if response.status_code == 200:
         response_data = response.json()

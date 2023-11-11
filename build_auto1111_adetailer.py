@@ -149,7 +149,7 @@ alwayson_scripts = {
         "args": [
             {
                 "ad_model": "face_yolov8n.pt",
-                "ad_mask_k_largest": 4,
+                "ad_mask_k_largest": 6,
             }
         ]
     },
@@ -210,6 +210,9 @@ metadata["sampler_index"] = metadata["Sampler"]
 metadata["alwayson_scripts"] = alwayson_scripts
 
 # Call Auto1111 API
+OKGREEN = '\033[92m'
+ENDC = '\033[0m'
+print(f"\n{OKGREEN}[ADETAILER-API-CALL] Building movie {clipName}{ENDC}\n")
 response = requests.post(url=f'{url}/sdapi/v1/txt2img', json=metadata)
 if response.status_code == 200:
     today_date = date.today().strftime("%Y-%m-%d")
