@@ -17,6 +17,16 @@ re_imagesize = re.compile(r"^(\d+)x(\d+)$")
 re_hypernet_hash = re.compile("\(([0-9a-f]+)\)$")
 
 
+def unquote(text):
+    if len(text) == 0 or text[0] != '"' or text[-1] != '"':
+        return text
+
+    try:
+        return json.loads(text)
+    except Exception:
+        return text
+
+
 def parse_generation_parameters(x: str):
     """parses generation parameters string, the one you see in text field under the picture in UI:
 ```

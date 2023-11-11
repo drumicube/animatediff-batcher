@@ -19,6 +19,33 @@ re_imagesize = re.compile(r"^(\d+)x(\d+)$")
 re_hypernet_hash = re.compile("\(([0-9a-f]+)\)$")
 
 
+def unquote(text):
+    if len(text) == 0 or text[0] != '"' or text[-1] != '"':
+        return text
+
+    try:
+        return json.loads(text)
+    except Exception:
+        return text
+
+
+def infotext_decode_animatediff(results):
+    for k, v in results.items():
+        if not k.startswith("AnimateDiff"):
+            continue
+
+        assert isinstance(v, str), f"Expect string but got {v}."
+        try:
+            for items in v.split(', '):
+                field, value = items.split(': ')
+                results[f"AnimateDiff {field}"] = value
+        except Exception:
+            print(
+                f"Failed to parse infotext, legacy format infotext is no longer supported:\n{v}"
+            )
+        break
+
+
 def parse_generation_parameters(x: str):
     """parses generation parameters string, the one you see in text field under the picture in UI:
 ```
@@ -142,43 +169,6 @@ if not os.path.exists(processedFolder):
 if not os.path.exists(framesFolder):
     os.makedirs(framesFolder)
 
-# Rebulding the clip with Adetailer on and frame interpolation Off
-
-alwayson_scripts = {
-    "ADetailer": {
-        "args": [
-            {
-                "ad_model": "face_yolov8n.pt",
-                "ad_mask_k_largest": 6,
-            }
-        ]
-    },
-    'AnimateDiff': {
-        'args': [{
-            'model': 'mm_sd_v15_v2.safetensors',  # Motion module
-            'format': ['GIF', 'PNG', 'TXT'],  # Save format, 'GIF' | 'MP4' | 'PNG' | 'WEBP' | 'TXT'
-            'enable': True,  # Enable AnimateDiff
-            'video_length': 16,  # Number of frames
-            'fps': 8,  # FPS
-            'loop_number': 0,  # Display loop number
-            'closed_loop': 'N',  # Closed loop, 'N' | 'R-P' | 'R+P' | 'A'
-            'batch_size': 16,  # Context batch size
-            'stride': 1,  # Stride
-            'overlap': -1,  # Overlap
-            'interp': 'Off',  # Frame interpolation, 'Off' | 'FILM'
-            'interp_x': 10,  # Interp X
-            'video_source': '',  # Video source
-            'video_path': '',  # Video path
-            'latent_power': 1,  # Latent power
-            'latent_scale': 32,  # Latent scale
-            'last_frame': None,  # Optional last frame
-            'latent_power_last': 1,  # Optional latent power for last frame
-            'latent_scale_last': 32  # Optional latent scale for last frame
-        }
-        ]
-    }
-}
-
 # Check original files
 originalMetadataFileName = clipFolder + "/" + clipName + ".txt"
 if not os.path.isfile(originalMetadataFileName):
@@ -196,6 +186,45 @@ metadata_file.close()
 
 # Rebuild metadata for Auto1111 API
 metadata = parse_generation_parameters(metadata_txt)
+infotext_decode_animatediff(metadata)
+
+# Rebulding the clip with Adetailer on and frame interpolation Off
+
+alwayson_scripts = {
+    "ADetailer": {
+        "args": [
+            {
+                "ad_model": "face_yolov8n.pt",
+                "ad_mask_k_largest": 6,
+            }
+        ]
+    },
+    'AnimateDiff': {
+        'args': [{
+            'model': metadata['AnimateDiff model'],  # Motion module
+            'format': ['GIF', 'PNG', 'TXT'],  # Save format, 'GIF' | 'MP4' | 'PNG' | 'WEBP' | 'TXT'
+            'enable': True,  # Enable AnimateDiff
+            'video_length': int(metadata['AnimateDiff video_length']),  # Number of frames
+            'fps': int(metadata['AnimateDiff fps']),  # FPS
+            'loop_number': int(metadata['AnimateDiff loop_number']),  # Display loop number
+            'closed_loop': metadata['AnimateDiff closed_loop'],  # Closed loop, 'N' | 'R-P' | 'R+P' | 'A'
+            'batch_size': int(metadata['AnimateDiff batch_size']),  # Context batch size
+            'stride': int(metadata['AnimateDiff stride']),  # Stride
+            'overlap': int(metadata['AnimateDiff overlap']),  # Overlap
+            'interp': 'Off',  # Frame interpolation, 'Off' | 'FILM'
+            'interp_x': int(metadata['AnimateDiff interp_x']),  # Interp X
+            'video_source': '',  # Video source
+            'video_path': '',  # Video path
+            'latent_power': 1,  # Latent power
+            'latent_scale': 32,  # Latent scale
+            'last_frame': None,  # Optional last frame
+            'latent_power_last': 1,  # Optional latent power for last frame
+            'latent_scale_last': 32  # Optional latent scale for last frame
+        }
+        ]
+    }
+}
+
 metadata["width"] = metadata["Size-1"]
 metadata["height"] = metadata["Size-2"]
 metadata["cfg_scale"] = metadata["CFG scale"]
