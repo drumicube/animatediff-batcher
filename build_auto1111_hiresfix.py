@@ -189,8 +189,15 @@ metadata["alwayson_scripts"] = alwayson_scripts
 
 OKGREEN = '\033[92m'
 ENDC = '\033[0m'
-current_frame = 0
 
+# Load metadata checkpoint
+response = requests.post(url=f'{url}/sdapi/v1/options', json={"sd_model_checkpoint": metadata["Model"], "sd_vae": metadata["VAE"]})
+if response.status_code != 200:
+    print("Aborting: Unable to load checkpoint " + metadata["Model"])
+    exit(1)
+
+# Generate All Hires frames
+current_frame = 0
 filelist=os.listdir(esrganFramesFolder)
 for imageName in filelist[:]:
     if not(imageName.endswith(".png")):

@@ -24,17 +24,15 @@ Cherry-pick your favorite ones, and let this tool runs for hours in the backgrou
 ## Limitations
 
 * Linux only, no support for Windows. 
-* Checkpoint/Model swapping is not supported: The last loaded checkpoint by Auto1111 will be used by this tool.
 * Prompt travel is not supported.
 * 16 frames support only (not tested with more, but it will surely fail).
-* As it's required by Auto1111 API, you must tag your negative embeddings with the embedding keyword (```<embedding:bad-artist-anime>, <embedding:bad-picture-chill-75v>```)
+* Required by Auto1111 API: You must tag your negative embeddings with the embedding keyword (```<embedding:bad-artist-anime>, <embedding:bad-picture-chill-75v>```)
  
 
 ## Disclaimer
 
 Sorry, no support or bugfix.   
-This is just a dirty tool to ease my workflow, it did the job for me, I'm ok to share it, but it ends there.  
-I'm ok too for PR if you want to submit a fix or a new feature, but nothing more.
+This is just a dirty tool to ease my workflow, it did the job for me, I'm ok to share it, but don't expect more.  
 
 ## Configuration
 

@@ -155,11 +155,11 @@ auto1111Folder = sys.argv[2]
 clipName = sys.argv[3]
 
 if not os.path.isdir(clipFolder):
-    print("Aborting clipFolder: " + clipFolder + " does not exist.")
+    print("Aborting: clipFolder " + clipFolder + " does not exist.")
     exit(1)
 animatediff_path = auto1111Folder + "/outputs/txt2img-images/AnimateDiff"
 if not os.path.isdir(animatediff_path):
-    print("Aborting animatediff_path: " + animatediff_path + " does not exist.")
+    print("Aborting: animatediff_path " + animatediff_path + " does not exist.")
     exit(1)
 
 processedFolder = clipFolder + "/processed"
@@ -172,11 +172,11 @@ if not os.path.exists(framesFolder):
 # Check original files
 originalMetadataFileName = clipFolder + "/" + clipName + ".txt"
 if not os.path.isfile(originalMetadataFileName):
-    print("Metadata file " + originalMetadataFileName + " not found.")
+    print("Aborting: Metadata file " + originalMetadataFileName + " not found.")
     exit(1)
 originalGifFileName = clipFolder + "/" + clipName + ".gif"
 if not os.path.isfile(originalGifFileName):
-    print("Gif file " + originalGifFileName + " not found.")
+    print("Aborting: Gif file " + originalGifFileName + " not found.")
     exit(1)
 
 # Read metadata file
@@ -241,6 +241,14 @@ metadata["alwayson_scripts"] = alwayson_scripts
 # Call Auto1111 API
 OKGREEN = '\033[92m'
 ENDC = '\033[0m'
+
+# Load metadata checkpoint
+response = requests.post(url=f'{url}/sdapi/v1/options', json={"sd_model_checkpoint": metadata["Model"], "sd_vae": metadata["VAE"]})
+if response.status_code != 200:
+    print("Aborting: Unable to load checkpoint " + metadata["Model"])
+    exit(1)
+
+# Generate the image
 print(f"\n{OKGREEN}[ADETAILER-API-CALL] Building movie {clipName}{ENDC}\n")
 response = requests.post(url=f'{url}/sdapi/v1/txt2img', json=metadata)
 if response.status_code == 200:
