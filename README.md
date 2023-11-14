@@ -7,8 +7,8 @@ To prevent ADetailer crashing on the second movie generation, Auto1111 is reboot
 
 The motivation behind this tool was pretty simple:  
 Building AnimateDiff clips with high quality settings is very time consuming.  
-Just generate lots of quick and minimal AnimateDiff clips (on frame interpolation, no Adetailer, low res) under Auto1111 as usual.  
-Then, copy your favorite selection in a working folder, and let this tool automatically rebuild them in higher quality.  
+Just batch lots of quick and minimal AnimateDiff clips (no frame interpolation, no Adetailer, low res) under Auto1111 as usual.  
+Then, copy your favorite clip selection in a working folder, and let this tool automatically rebuild them in higher quality.  
 
 ## Requirements
 
