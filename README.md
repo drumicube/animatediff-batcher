@@ -1,13 +1,14 @@
 # animatediff-batcher
 
-This is a small scripting tool to batch process animatediff clips generated under automatic1111:  
+A small scripting tool to batch process simple animatediff clips generated under automatic1111:  
 This script will process all AnimateDiff clips stored in a predefined input folder (animatediff_input_folder).  
 All clips will be regenerated, adding to them a ADetailer pass, an ESRGAN pass, an img2img hires fix pass and a frame interpolation pass (60fps) using Rife or IFRNET.   
-To prevent the ADetailer crash on the second movie generation, Auto1111 is rebooted on each animation.
+To prevent ADetailer crashing on the second movie generation, Auto1111 is rebooted before processing each animation.
 
 The motivation behind this tool was pretty simple:  
-Generate lots of quick and basic AnimateDiff clips under Auto1111 as usual.  
-Cherry-pick your favorite ones, and let this tool runs for hours in the background to improve them.  
+Building AnimateDiff clips with high quality settings is very time consuming.  
+Just generate lots of quick and minimal AnimateDiff clips (on frame interpolation, no Adetailer, low res) under Auto1111 as usual.  
+Then, copy your favorite selection in a working folder, and let this tool automatically rebuild them in higher quality.  
 
 ## Requirements
 
@@ -31,8 +32,9 @@ Cherry-pick your favorite ones, and let this tool runs for hours in the backgrou
 
 ## Disclaimer
 
-Sorry, no support or bugfix.   
-This is just a dirty tool to ease my workflow, it did the job for me, I'm ok to share it, but don't expect more.  
+Sorry, no support or bugfix, use this at your own risk.   
+I have no intention to maintain this, it's just a dirty tool to automate my workflow.  
+It did the job for me, I'm done with it.  
 
 ## Configuration
 
@@ -67,7 +69,7 @@ This variable must point to a folder where you have cherry-picked and copied Ani
 
 * Create a **animatediff_input_folder** folder (ex: /home/user/mybestclips).
 * Create a subfolder inside your **animatediff_input_folder** for your current project (ex: /home/user/mybestclips/project1) 
-* Batch generate AnimateDiff clips under Auto1111 as usual. (No Adetailer, 16 frames, Interpolation to Off)
+* Batch generate simple AnimateDiff clips under Auto1111 as usual. (No highres fix, No Adetailer, 16 frames, Interpolation to Off)
 * Copy all your favorite AnimateDiff clips (gif + txt files) into your project folder (ex: /home/user/mybestclips/project1)  
 * Ensure your **animatediff-batcher.cfg** is correctly set, especially the needed paths.
 
@@ -79,7 +81,7 @@ Run the following command to process all clips located into your project1 folder
 ```
 
 **Important:**   
-As a reboot of Auto1111 is needed on each clip generation (ADetailer crash), your current Auto1111 session will be terminated!  
+As a reboot of Auto1111 is needed on each clip generation (ADetailer crash on second AnimateDiff clip), your current Auto1111 session will be terminated!  
 Do not use Auto1111 while this script is running. Restart Auto1111 once it's finished.
 
 ### After processing:
@@ -105,7 +107,7 @@ Your 'project1' folder should now look like this:
 An additional helper script is also available to quickly merge several clips into final movies:  
 
 * In the output folder containing all the webm of your project, create as many movie sub-folder as needed (movie1, movie2 etc.)
-* Copy the needed webm clips into the needed movie subfolders to build your sequence.
+* Copy the needed webm clips from the parent folder in the needed movie subfolders to build your sequence.
 
 Run this command to merge all clips by movie folder.
 ```commandline
@@ -113,4 +115,4 @@ Run this command to merge all clips by movie folder.
 ```
 A merged webm file should be present in each movie sub-folder.
 
-**Note:** The merge being based on clip names, just add a number prefix to clip files for updating order sequence.  
+**Note:** The merge being based on clip names, just add a number prefix to clip files for fine tuning the clip order.  
